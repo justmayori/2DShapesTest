@@ -12,15 +12,33 @@ class Shape(ABC):
     def area(self):
         pass
 
-class Square(Shape):
-    def __init__(self, side): 
-        self.side = side
-    
+class Triangle(Shape):
+    def __init__(self, point1_x, point1_y, point2_x, point2_y, point3_x, point3_y):
+        self.point1_x = point1_x
+        self.point1_y = point1_y
+        self.point2_x = point2_x
+        self.point2_y = point2_y
+        self.point3_x = point3_x
+        self.point3_y = point3_y
+
     def perimeter(self):
-        return 4 * self.side
+        
     
+        side1 = math.sqrt((self.point1_x - self.point2_x) ** 2 + (self.point1_y - self.point2_y) ** 2)
+        side2 = math.sqrt((self.point1_x - self.point3_x) ** 2 + (self.point1_y - self.point3_y) ** 2)
+        side3 = math.sqrt((self.point2_x - self.point3_x) ** 2 + (self.point2_y - self.point3_y) ** 2)
+
+        self.side1 = side1
+        self.side2 = side2
+        self.side3 = side3
+
+        return side1 + side2 + side3
+
     def area(self):
-        return self.side ** 2
+        
+        s = float(self.perimeter()) / 2 
+        area = math.sqrt(s * (s - self.side1) * (s - self.side2) * (s - self.side3))
+        return area
 
 
 class Rectangle(Shape):
@@ -36,6 +54,11 @@ class Rectangle(Shape):
     def area(self):
         return (self.top_right_x - self.bottom_left_x) * (self.top_right_y - self.bottom_left_y)
 
+class Square(Rectangle):
+    def __init__(self, side): 
+        
+        self.side = side
+        super().__init__(side, side, 0, 0)
 
 class Circle(Shape):
     def __init__(self, center_x, center_y, radius):
@@ -133,6 +156,37 @@ def test_circle():
     circle = Circle(3, 7, 5)
     assert circle.perimeter() == pytest.approx(2 * math.pi * 5)
     assert circle.area() == pytest.approx(math.pi * 5**2)                      
-            
+
+def test_rectagle_attributes():
+    rectangle = Rectangle(2, 2, 1, 1)
+    assert rectangle.top_right_x == 2
+    assert rectangle.top_right_y == 2
+    assert rectangle.bottom_left_x == 1
+    assert rectangle.bottom_left_y == 1
+
+def test_square_attributes():
+    square = Square(2)
+    assert square.side == 2
+    assert square.top_right_x == 2
+    assert square.top_right_y == 2
+    assert square.bottom_left_x == 0
+    assert square.bottom_left_y == 0
+
+def test_triangle_attributes():
+    triangle = Triangle(0, 1, 1, 1, 1, 0)
+    assert triangle.point1_x == 0
+    assert triangle.point1_y == 1
+    assert triangle.point2_x == 1
+    assert triangle.point2_y == 1
+    assert triangle.point3_x == 1
+    assert triangle.point3_y == 0
+
+
+def test_triangle():
+    triangle = Triangle(0, 1, 1, 1, 1, 0)
+    assert triangle.perimeter() == 3.414213562373095
+    assert triangle.area() == pytest.approx(0.5)
+    
+
 if __name__ == "__main__":
     main()
